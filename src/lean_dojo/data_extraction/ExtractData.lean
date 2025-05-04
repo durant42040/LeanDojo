@@ -1,3 +1,4 @@
+import Lean.Meta.Tactic.Clear
 import Lean
 import Lake
 
