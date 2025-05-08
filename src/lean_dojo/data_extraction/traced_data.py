@@ -847,44 +847,48 @@ class TracedFile:
 
         def _callback4(node: Node, _) -> None:
             if is_potential_premise_lean4(node):
-                start, end = node.get_closure()
-                if isinstance(node, CommandDeclarationNode) and node.is_theorem:
-                    # We assume theorems are defined using keywords "theorem"
-                    # or "lemma" but not, e.g., "def".
-                    proof_start, _ = (
-                        node.get_theorem_node().get_proof_node().get_closure()
-                    )
-                    code = get_code_without_comments(
-                        self.lean_file, start, proof_start, self.comments
-                    )
-                    if code.endswith(":="):
-                        code = code[:-2].strip()
-                else:
-                    code = get_code_without_comments(
-                        self.lean_file, start, end, self.comments
-                    )
-                # TODO: For alias, restate_axiom, etc., the code is not very informative.
-                if is_mutual_lean4(node):
-                    for s in node.full_name:
+                try:
+                    start, end = node.get_closure()
+                    if isinstance(node, CommandDeclarationNode) and node.is_theorem:
+                        # We assume theorems are defined using keywords "theorem"
+                        # or "lemma" but not, e.g., "def".
+                        proof_start, _ = (
+                            node.get_theorem_node().get_proof_node().get_closure()
+                        )
+                        code = get_code_without_comments(
+                            self.lean_file, start, proof_start, self.comments
+                        )
+                        if code.endswith(":="):
+                            code = code[:-2].strip()
+                    else:
+                        code = get_code_without_comments(
+                            self.lean_file, start, end, self.comments
+                        )
+                    # TODO: For alias, restate_axiom, etc., the code is not very informative.
+                    if is_mutual_lean4(node):
+                        for s in node.full_name:
+                            results.append(
+                                {
+                                    "full_name": s,
+                                    "code": code,
+                                    "start": list(start),
+                                    "end": list(end),
+                                    "kind": node.kind(),
+                                }
+                            )
+                    else:
                         results.append(
                             {
-                                "full_name": s,
+                                "full_name": node.full_name,
                                 "code": code,
                                 "start": list(start),
                                 "end": list(end),
                                 "kind": node.kind(),
                             }
                         )
-                else:
-                    results.append(
-                        {
-                            "full_name": node.full_name,
-                            "code": code,
-                            "start": list(start),
-                            "end": list(end),
-                            "kind": node.kind(),
-                        }
-                    )
+                except Exception as e:
+                    logger.warning(f"Failed to process node: {e}")
+                    logger.warning(f"Node: {node}")
 
         self.traverse_preorder(_callback4, node_cls=None)
         return results

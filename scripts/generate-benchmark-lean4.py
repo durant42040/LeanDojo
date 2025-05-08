@@ -18,7 +18,7 @@ from lean_dojo.constants import LEAN4_PACKAGES_DIR
 random.seed(3407)  # https://arxiv.org/abs/2109.08203
 
 URL = "https://github.com/leanprover-community/mathlib4"
-COMMIT = "f4e4c9140913e6e2812c8fc7d7c5748e44e98e53"
+COMMIT = "c44e0c8ee63ca166450922a373c7409c5d26b00b"
 DST_DIR = Path("../leandojo_benchmark_4")
 NUM_VAL = NUM_TEST = 2000
 
@@ -238,6 +238,6 @@ def export_data(
 if __name__ == "__main__":
     freeze_support()
     repo = LeanGitRepo(URL, COMMIT)
-    traced_repo = trace(repo, dst_dir="mathlib4")
+    traced_repo = trace(repo, dst_dir="out")
     splits = split_data(traced_repo)
     export_data(traced_repo, splits, DST_DIR, dataset_name="LeanDojo Benchmark 4")
