@@ -206,7 +206,7 @@ def export_metadata(traced_repo: TracedRepo, dst_path: Path, **kwargs) -> None:
         "url": traced_repo.repo.url,
         "commit": traced_repo.repo.commit,
     }
-    metadata["leandojo_version"] = src.lean_dojo.__version__
+    metadata["leandojo_version"] = lean_dojo.__version__
     json.dump(metadata, (dst_path / "metadata.json").open("wt"))
 
 

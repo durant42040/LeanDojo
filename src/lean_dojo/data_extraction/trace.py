@@ -127,7 +127,7 @@ def _trace(repo: LeanGitRepo, build_deps: bool) -> None:
 
     # Trace `repo` in the current working directory.
     assert not repo.is_lean4, "Cannot trace Lean 4 itself."
-    # repo.clone_and_checkout()
+    repo.clone_and_checkout()
     logger.debug(f"Tracing {repo}")
 
     with working_directory(repo.name):
@@ -137,7 +137,7 @@ def _trace(repo: LeanGitRepo, build_deps: bool) -> None:
                 execute("lake exe cache get")
             except CalledProcessError:
                 pass
-        # execute("lake build")
+        execute("lake build")
 
         # Copy the Lean 4 stdlib into the path of packages.
         lean_prefix = execute(f"lean --print-prefix", capture_output=True)[0].strip()
@@ -208,7 +208,7 @@ def get_traced_repo_path(repo: LeanGitRepo, build_deps: bool = True) -> Path:
     path = cache.get(rel_cache_dir)
     if path is None:
         logger.info(f"Tracing {repo}")
-        with working_directory("temp") as tmp_dir:
+        with working_directory() as tmp_dir:
             logger.debug(f"Working in the temporary directory {tmp_dir}")
             _trace(repo, build_deps)
             src_dir = tmp_dir / repo.name
